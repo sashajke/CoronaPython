@@ -7,46 +7,46 @@ import DTO
 
 class _Repository:
     def __init__(self):
-        self._conn = sqlite3.connect('grades.db')
+        self._conn = sqlite3.connect('database.db')
         self.vaccines = Dao(DTO.Vaccine, self._conn)
         self.suppliers = Dao(DTO.Supplier, self._conn)
         self.clinics = Dao(DTO.Clinic, self._conn)
         self.logistics = Dao(DTO.Logistic, self._conn)
 
-    def _close(self):
+    def close(self):
         self._conn.commit()
         self._conn.close()
 
     def create_tables(self):
         self._conn.executescript("""
-        CREATE TABLE vaccines (
-            id      INTEGER     PRIMARY KEY,
-            date    TEXT        NOT NULL,
+        CREATE TABLE IF NOT EXISTS vaccines (
+            id INTEGER PRIMARY KEY,
+            date TEXT NOT NULL,
             supplier INTEGER ,
             quantity INTEGER NOT NULL ,
             FOREIGN KEY(supplier) REFERENCES suppliers(id)
         );
 
-        CREATE TABLE suppliers (
-            id                 INT     PRIMARY KEY,
-            name                TEXT NOT NULL,
+        CREATE TABLE IF NOT EXISTS suppliers (
+            id INTEGER PRIMARY KEY,
+            name TEXT NOT NULL,
             logistic INTEGER ,
             FOREIGN KEY(logistic) REFERENCES logistics(id)
         );
 
-        CREATE TABLE clinics (
-            id                 INT     PRIMARY KEY,
-            location                TEXT NOT NULL,
+        CREATE TABLE IF NOT EXISTS clinics (
+            id INTEGER PRIMARY KEY,
+            location TEXT NOT NULL,
             demand INTEGER NOT NULL ,
             logistic INTEGER ,
             FOREIGN KEY(logistic) REFERENCES logistics(id)
         );
         
-        CREATE TABLE logistics (
-             id                 INT     PRIMARY KEY,
-             name                TEXT NOT NULL,
+        CREATE TABLE IF NOT EXISTS logistics (
+             id INTEGER PRIMARY KEY,
+             name TEXT NOT NULL,
              count_sent INTEGER NOT NULL ,
-             count_received INTEGER NOT NULL ,
+             count_received INTEGER NOT NULL
         );
         """)
 
@@ -54,13 +54,14 @@ class _Repository:
         # insert the next vaccine to the vaccine table
         lastId = self.vaccines.getLastInsertedId()
         newVaccine = DTO.Vaccine(lastId + 1, date, nameOfSup, amount)
+        self.vaccines.insert(newVaccine)
         # get the id of the logistics from the suppliers table using the name
 
         supplier = self.suppliers.find(name=nameOfSup)
         idOfLogistics = supplier.logistic
 
         # update the count_received of this logistics company in logistics table
-        set_value = {"count_received": "count_receieved+" + str(amount)}
+        set_value = {"count_received": "count_received+" + str(amount)}
 
         # only where the id = idOfLogistics we got from the find query
         cond = {"id": idOfLogistics}
@@ -68,7 +69,7 @@ class _Repository:
 
     def sendShipment(self, locationOfClinic, amount):
         # remove amount from the demand of location
-        set_value = {"demand": "demand-" + str(amount)}
+        set_value = {"demand": "demand - " + str(amount)}
         cond = {"location": locationOfClinic}
         self.clinics.update(set_value, cond)
         # remove amount from inventory
@@ -95,3 +96,4 @@ class _Repository:
 
 
 repo = _Repository()
+repo.create_tables()
