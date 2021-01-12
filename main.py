@@ -8,7 +8,7 @@ def main(args):
     sum.setFilePath(args[3])
     readConfig(args[1])
     executeOrders(args[2])
-    sum.saveToFile()
+    sum.close()
     repo.close()
 
 
@@ -57,7 +57,6 @@ def readConfig(filePath):
             logisticDetails = line.split(',')
         logistic = DTO.Logistic(*logisticDetails)
         repo.logistics.insert(logistic)
-
     config.close()
 
 
@@ -75,6 +74,8 @@ def executeOrders(filePath):
         else:
             repo.sendShipment(*orderParts)
             sum.shipmentSent(int(orderParts[1]))
+        sum.saveToFile()
+
     orders.close()
 
 
