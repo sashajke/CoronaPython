@@ -41,7 +41,7 @@ class _Repository:
         );
         CREATE TABLE IF NOT EXISTS vaccines (
             id INTEGER PRIMARY KEY,
-            date TEXT NOT NULL,
+            date date NOT NULL,
             supplier INTEGER ,
             quantity INTEGER NOT NULL ,
             FOREIGN KEY(supplier) REFERENCES suppliers(id)

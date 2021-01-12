@@ -1,7 +1,10 @@
+import datetime
 class Vaccine:
     def __init__(self, id, date, supplier, quantity):
         self.id = int(id)
-        self.date = date
+        dateParts = date.split('-')
+        datePartsInt = [int(arg) for arg in dateParts]
+        self.date = datetime.datetime(*datePartsInt).date()
         self.supplier = int(supplier)
         self.quantity = int(quantity)
 
