@@ -28,23 +28,20 @@ class _Repository:
         CREATE TABLE IF NOT EXISTS suppliers (
             id INTEGER PRIMARY KEY,
             name TEXT NOT NULL,
-            logistic INTEGER ,
-            FOREIGN KEY(logistic) REFERENCES logistics(id)
+            logistic INTEGER REFERENCES logistics(id)
         );
 
         CREATE TABLE IF NOT EXISTS clinics (
             id INTEGER PRIMARY KEY,
             location TEXT NOT NULL,
             demand INTEGER NOT NULL ,
-            logistic INTEGER ,
-            FOREIGN KEY(logistic) REFERENCES logistics(id)
+            logistic INTEGER REFERENCES logistics(id)
         );
         CREATE TABLE IF NOT EXISTS vaccines (
             id INTEGER PRIMARY KEY,
-            date date NOT NULL,
-            supplier INTEGER ,
-            quantity INTEGER NOT NULL ,
-            FOREIGN KEY(supplier) REFERENCES suppliers(id)
+            date DATE NOT NULL,
+            supplier INTEGER REFERENCES suppliers(id),
+            quantity INTEGER NOT NULL
         );
         """)
 
@@ -54,6 +51,7 @@ class _Repository:
 
         supplier = self.suppliers.find(name=nameOfSup)
         supplierIndex = supplier[0].id
+        # get the id of the last inserted line to create a new id for the new vaccine
         lastId = self.vaccines.getLastInsertedId()
         newId = lastId[0] + 1
         newVaccine = DTO.Vaccine(newId, date, supplierIndex, amount)
@@ -71,8 +69,8 @@ class _Repository:
         self.logistics.update(set_value, cond)
 
     def sendShipment(self, locationOfClinic, amount):
-        # remove amount from the demand of location
         clinic = self.clinics.find(location=locationOfClinic)
+        # get the id of the logistic of this clinic
 
         idOfLogistics = clinic[0].logistic
         # update the count_sent of this logistics company in logistics table
@@ -90,16 +88,20 @@ class _Repository:
         for vaccine in allVaccines:
             if tempAmount == 0:
                 break
+            # we need to delete the line since the quantity will be zero
+
             if vaccine.quantity <= int(tempAmount):
                 self.vaccines.delete(id=vaccine.id)
                 tempAmount = tempAmount - int(vaccine.quantity)
+            # if we can take amount and not delete
+
             else:
                 set_value = {'quantity': vaccine.quantity - int(tempAmount)}
                 cond = {"id": vaccine.id}
                 self.vaccines.update(set_value, cond)
                 tempAmount = 0
 
-        # get the id of the logistic of this clinic
+        # remove amount from the demand of location
 
         currDemand = clinic[0].demand
 

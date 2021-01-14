@@ -7,10 +7,11 @@ import sys
 def readConfig(filePath):
     with open(filePath, "r") as config:
         amountOfEachPart = config.readline()[0:-1].split(',')
-        # read the vaccines
         numOfVaccines = int(amountOfEachPart[0])
+        # first read the vaccines
         for x in range(0, numOfVaccines):
             line = config.readline()
+            # remove \n at the end of each line if exists
             if "\n" in line:
                 vaccineDetails = line[0:-1].split(',')
             else:
@@ -22,6 +23,7 @@ def readConfig(filePath):
         numOfSuppliers = int(amountOfEachPart[1])
         for i in range(0, numOfSuppliers):
             line = config.readline()
+            # remove \n at the end of each line if exists
             if "\n" in line:
                 supplierDetails = line[0:-1].split(',')
             else:
@@ -32,6 +34,7 @@ def readConfig(filePath):
         numOfClinics = int(amountOfEachPart[2])
         for i in range(0, numOfClinics):
             line = config.readline()
+            # remove \n at the end of each line if exists
             if "\n" in line:
                 clinicDetails = line[0:-1].split(',')
             else:
@@ -43,6 +46,7 @@ def readConfig(filePath):
         numOfLogistics = int(amountOfEachPart[3])
         for i in range(0, numOfLogistics):
             line = config.readline()
+            # remove \n at the end of each line if exists
             if "\n" in line:
                 logisticDetails = line[0:-1].split(',')
             else:
@@ -55,6 +59,7 @@ def executeOrders(filePath):
     with open(filePath) as orders:
         for order in orders:
             line = order.strip()
+            # remove \n at the end of each line if exists
             if "\n" in line:
                 orderParts = line.split[0:-1](',')
             else:
@@ -74,3 +79,4 @@ if __name__ == '__main__':
     executeOrders(sys.argv[2])
     sum.close()
     repo.close()
+

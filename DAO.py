@@ -78,6 +78,7 @@ class Dao:
                                                     ' AND '.join([cond + '=?' for cond in cond_column_names]))
         self._conn.execute(stmt, params)
 
+    # return the id of the last inserted line
     def getLastInsertedId(self):
         cursor = self._conn.cursor()
         stmt = 'SELECT {} FROM {} ORDER BY {} DESC LIMIT 1'.format('id', self._table_name, 'id')
@@ -85,6 +86,7 @@ class Dao:
         returnId = cursor.fetchone()
         return returnId
 
+    # a function that return a list of DTO's in Ascending order by a certain column
     def findWithASCOrder(self, column_name):
         stmt = 'SELECT * FROM {} ORDER BY {} ASC'.format(self._table_name, column_name)
         c = self._conn.cursor()

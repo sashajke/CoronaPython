@@ -27,10 +27,12 @@ class _Summary:
         self.filePath = filePath
         self.file = open(filePath, 'w')
 
+    # function that is called after receiveShipment is executed
     def shipmentReceived(self, amountReceived):
         self.setInventory(self.totalInventory + amountReceived)
         self.setReceived(self.totalReceived + amountReceived)
 
+    # function that is called after sendShipment is executed
     def shipmentSent(self, amountSent):
         self.setInventory(self.totalInventory - amountSent)
         self.setDemand(self.totalDemand - amountSent)
